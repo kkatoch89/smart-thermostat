@@ -1,10 +1,11 @@
 import React from 'react';
 import Layout from './components/Layout';
+import Thermostat from './containers/Thermostat';
 
 function App() {
 	return (
 		<Layout>
-			<p>APP</p>
+			<Thermostat />
 		</Layout>
 	);
 }

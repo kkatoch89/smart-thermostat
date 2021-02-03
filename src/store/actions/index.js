@@ -1,3 +1,8 @@
 export { hello } from './hello';
 
-export { toggleThermostat } from './thermostatControls';
+export {
+	toggleThermostat,
+	increaseTemp,
+	decreaseTemp,
+	fetchUID,
+} from './thermostatControls';

@@ -1,30 +1,25 @@
 import React from 'react';
 import GlobalStyles from '../styles/GlobalStyles';
 import 'normalize.css';
-import { connect } from 'react-redux';
+import styled from 'styled-components';
 
-import * as actions from '../store/actions/index';
+const LayoutStyles = styled.div`
+	.wrapper {
+		max-width: 1400px;
+		min-height: 100vh;
+		margin: 0 auto;
+		text-align: center;
+		border: 2px solid orangered;
+	}
+`;
 
-const Layout = (props) => {
+const Layout = ({ children }) => {
 	return (
-		<>
+		<LayoutStyles>
 			<GlobalStyles />
-			{props.hello.hello && <h1>Hello!</h1>}
-			<button onClick={() => props.onHello()}>Button</button>
-		</>
+			<div className="wrapper">{children}</div>
+		</LayoutStyles>
 	);
 };
 
-const mapStateToProps = (state) => {
-	return {
-		hello: state.hello,
-	};
-};
-
-const mapDispatchToProps = (dispatch) => {
-	return {
-		onHello: () => dispatch(actions.hello()),
-	};
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Layout);
+export default Layout;

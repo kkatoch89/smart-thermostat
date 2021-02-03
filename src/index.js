@@ -12,6 +12,7 @@ import App from './App';
 import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
 import helloReducer from './store/reducers/hello';
+import thermostatControlsReducer from './store/reducers/thermostatControls';
 
 const composeEnhancers =
 	process.env.NODE_ENV === 'development'
@@ -20,6 +21,7 @@ const composeEnhancers =
 
 const rootReducer = combineReducers({
 	hello: helloReducer,
+	thermostatControls: thermostatControlsReducer,
 });
 
 const store = createStore(
