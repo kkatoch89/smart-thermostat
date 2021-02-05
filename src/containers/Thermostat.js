@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
+import moment from 'moment';
 import styled from 'styled-components';
 
 import * as actions from '../store/actions/index';
+import useInterval from '../hooks/useInterval';
+import LiveChart from '../components/LiveChart';
 
 const ThermostatStyles = styled.div`
 	position: relative;
@@ -24,11 +27,27 @@ const ThermostatStyles = styled.div`
 	}
 `;
 
-// Register modal if not registered
-// If registered, save uid_hash to state
-
 const Thermostat = (props) => {
-	console.log(!!props.uid);
+	const { onCheckSessionUid, onFetchLiveData, uid } = props;
+	// Check if there is uid stored in session storage (on mount)
+	useEffect(() => {
+		onCheckSessionUid();
+		const timestamp = Date.now();
+		console.log(`[On mount]: ${timestamp}`);
+		const timestampStart = moment(timestamp).subtract(5, 'm').format();
+		const timestampEnd = moment(timestamp).format();
+		onFetchLiveData(timestampStart, timestampEnd, uid);
+	}, [onCheckSessionUid, onFetchLiveData, uid]);
+
+	// Fetch live data every 5 mins
+	useInterval(() => {
+		const timestamp = Date.now();
+		console.log(`[On timer]: ${timestamp}`);
+		const timestampStart = moment(timestamp).subtract(5, 'm').format();
+		const timestampEnd = moment(timestamp).format();
+		onFetchLiveData(timestampStart, timestampEnd, uid);
+	}, 300000);
+
 	return (
 		<ThermostatStyles>
 			<p>{props.uid}</p>
@@ -40,8 +59,12 @@ const Thermostat = (props) => {
 				Register Thermostat
 			</button>
 			<h1>Unit 100 - Thermostat</h1>
-			<button onClick={props.onToggleThermostat}>
-				Turn {props.thermostatOn ? 'on' : 'off'}
+			<button
+				type="button"
+				value="off"
+				onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
+			>
+				Turn off
 			</button>
 			<div className="controls">
 				<p>{props.setUserTemp}&#176;</p>
@@ -50,29 +73,57 @@ const Thermostat = (props) => {
 			</div>
 			<div className="controls">
 				<h2>Thermostat Mode</h2>
-				<button>Auto</button>
-				<button>Cooling</button>
-				<button>Heating</button>
-				<button>Ventilation</button>
+				<button
+					value="auto_heat"
+					onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
+				>
+					Auto
+				</button>
+				<button
+					value="cool"
+					onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
+				>
+					Cooling
+				</button>
+				<button
+					value="heat"
+					onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
+				>
+					Heating
+				</button>
+				<button
+					value="auto_standby"
+					onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
+				>
+					Ventilation
+				</button>
 			</div>
+			<LiveChart />
 		</ThermostatStyles>
 	);
 };
 
 const mapStateToProps = (state) => {
 	return {
-		thermostatOn: state.thermostatControls.thermostatOn,
+		thermostatState: state.thermostatControls.thermostatState,
 		setUserTemp: state.thermostatControls.setUserTemp,
 		uid: state.thermostatControls.uid,
+		temperatureReadings: state.thermostatControls.temperatureReadings,
 	};
 };
 
 const mapDispatchToProps = (dispatch) => {
 	return {
-		onToggleThermostat: () => dispatch(actions.toggleThermostat()),
+		onToggleThermostat: (newState) =>
+			dispatch(actions.toggleThermostat(newState)),
 		onIncreaseTemp: () => dispatch(actions.increaseTemp()),
 		onDecreaseTemp: () => dispatch(actions.decreaseTemp()),
 		onRegisterThermostat: () => dispatch(actions.fetchUID()),
+		onCheckSessionUid: () => dispatch(actions.checkSessionUid()),
+		onChangeStateAPI: (newState, uid) =>
+			dispatch(actions.changeStateAPI(newState, uid)),
+		onFetchLiveData: (timestampStart, timestampEnd, uid) =>
+			dispatch(actions.fetchLiveData(timestampStart, timestampEnd, uid)),
 	};
 };
 

@@ -3,13 +3,17 @@ import { updateObject } from '../../shared/utility';
 
 const initialState = {
 	uid: null,
-	thermostatOn: false,
+	thermostatState: 'off',
 	setUserTemp: 45,
+	temperatureReadings: {},
 };
 
+/**************************************
+	STATE
+**************************************/
+
 const toggleThermostat = (state, action) => {
-	const updateElement = !state.thermostatOn;
-	return updateObject(state, { thermostatOn: updateElement });
+	return updateObject(state, { thermostatState: action.newState });
 };
 
 const increaseTemp = (state, action) => {
@@ -20,6 +24,23 @@ const increaseTemp = (state, action) => {
 const decreaseTemp = (state, action) => {
 	return updateObject(state, { setUserTemp: state.setUserTemp - 1 });
 };
+
+/**************************************
+	LIVE DATA
+**************************************/
+
+const liveTempDataSuccess = (state, action) => {
+	// console.log({ ...action.readings });
+	const updatedReadings = updateObject(
+		state.temperatureReadings,
+		action.readings
+	);
+	return updateObject(state, { temperatureReadings: updatedReadings });
+};
+
+/**************************************
+	AUTH
+**************************************/
 
 const registerSuccess = (state, action) => {
 	return updateObject(state, {
@@ -37,6 +58,8 @@ const thermostatControlsReducer = (state = initialState, action) => {
 			return decreaseTemp(state, action);
 		case actionTypes.REGISTER_SUCCESS:
 			return registerSuccess(state, action);
+		case actionTypes.LIVE_TEMP_DATA_SUCCESS:
+			return liveTempDataSuccess(state, action);
 		default:
 			return state;
 	}

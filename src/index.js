@@ -11,7 +11,6 @@ import thunk from 'redux-thunk';
 import App from './App';
 import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
-import helloReducer from './store/reducers/hello';
 import thermostatControlsReducer from './store/reducers/thermostatControls';
 
 const composeEnhancers =
@@ -20,7 +19,6 @@ const composeEnhancers =
 		: null || compose;
 
 const rootReducer = combineReducers({
-	hello: helloReducer,
 	thermostatControls: thermostatControlsReducer,
 });
 

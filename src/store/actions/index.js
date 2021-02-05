@@ -1,8 +1,10 @@
-export { hello } from './hello';
-
 export {
 	toggleThermostat,
 	increaseTemp,
 	decreaseTemp,
 	fetchUID,
+	checkSessionUid,
+	changeStateAPI,
+	fetchLiveData,
+	liveTempDataSuccess,
 } from './thermostatControls';
