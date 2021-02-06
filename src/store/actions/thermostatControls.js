@@ -20,7 +20,6 @@ export const changeStateAPI = (newState, uid) => {
 			.then(({ data }) => {
 				// If patch successful, update state
 				dispatch(toggleThermostat(data.state));
-				console.log(data, newState);
 			})
 			.catch((err) => {
 				console.log(err.message);

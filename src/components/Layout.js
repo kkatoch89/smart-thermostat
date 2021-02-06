@@ -5,11 +5,11 @@ import styled from 'styled-components';
 
 const LayoutStyles = styled.div`
 	.wrapper {
-		max-width: 1400px;
+		max-width: 1200px;
 		min-height: 100vh;
 		margin: 0 auto;
 		text-align: center;
-		border: 2px solid orangered;
+		/* border: 2px solid orangered; */
 	}
 `;
 

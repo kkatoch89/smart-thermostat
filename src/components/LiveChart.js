@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import moment from 'moment';
 import { Line } from 'react-chartjs-2';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 const ChartStyles = styled.div`
-	border: solid 2px orangered;
+	border: solid 2px white;
 	width: 70%;
 	padding: 2rem 0;
 	margin: 0 auto;
@@ -16,6 +15,7 @@ const LiveChart = (props) => {
 	const [labelArr, setLabelArr] = useState([]);
 	const [ambientValueArr, setAmbientValueArr] = useState([]);
 	const [targetValueArr, setTargetValueArr] = useState([]);
+
 	useEffect(() => {
 		// Sorting live readings based on timestamp
 		const sortedArr = Object.keys(temperatureReadings)
@@ -23,17 +23,16 @@ const LiveChart = (props) => {
 			.map((el) => ({
 				[el]: temperatureReadings[el],
 			}));
-		// console.log(
-		// 	`testArr: ${JSON.stringify(sortedArr)}`,
-		// 	`origArr: ${JSON.stringify(temperatureReadings)}`
-		// );
 
 		const labels = [];
 		const ambValues = [];
 		const targValues = [];
 		sortedArr.forEach((el, i) => {
+			// 1. Create array of labels (timestamps)
 			labels.push(Object.keys(el)[0]);
+			// 2. Create array of sensor values
 			ambValues.push(Object.values(el)[0]);
+			// 3. Create array of target temp values
 			targValues.push(targetTempLog[Object.keys(el)[0]]);
 			// console.log(targetTempLog[Object.keys(el)[0]]);
 		});
@@ -42,21 +41,6 @@ const LiveChart = (props) => {
 		setAmbientValueArr(ambValues);
 		setTargetValueArr(targValues);
 		// console.log(targetValueArr);
-
-		// 1. Create array of labels (timestamps)
-		// 2. Create array of values (temp)
-		// For ambient temp
-
-		// for (let key in sortedArr) {
-		// 	// const myDate = moment(key, 'MMMM Do YYYY, h:mm:ss a').toDate();
-		// 	// console.log(myDate);
-		// 	setLabelArr((oldArray) => [...oldArray, key]);
-		// 	setAmbientValueArr((oldArray) => [...oldArray, temperatureReadings[key]]);
-		// }
-		// For target temp
-		// for (let key in targetTempLog) {
-		// 	setTargetValueArr((oldArray) => [...oldArray, targetTempLog[key]]);
-		// }
 	}, [temperatureReadings]);
 
 	// 3. Inject array of labels and values into LiveChart
@@ -106,6 +90,9 @@ const LiveChart = (props) => {
 										return `${value}°`;
 									},
 								},
+								gridLines: {
+									color: '#ffffff',
+								},
 							},
 						],
 						xAxes: [
@@ -114,12 +101,18 @@ const LiveChart = (props) => {
 									maxRotation: 90,
 									minRotation: 90,
 								},
+								gridLines: {
+									color: '#ffffff',
+								},
 							},
 						],
 					},
 					legend: {
 						display: true,
 						position: 'top',
+					},
+					layout: {
+						backgroundColor: 'rgba(224, 142, 59,1)',
 					},
 				}}
 			/>

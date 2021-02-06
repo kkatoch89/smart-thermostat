@@ -2,9 +2,7 @@ import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyles = createGlobalStyle`
   :root {
-    --red: #FF4949;
-    --black: #2E2E2E;
-    --yellow: #ffc600;
+    --blue: rgba(2, 188, 199, .8);
     --white: #fff;
     --grey: #efefef;
   }
@@ -16,13 +14,8 @@ const GlobalStyles = createGlobalStyle`
     font-size: 2rem;
   }
 
-  fieldset {
-    border-color: rgba(0,0,0,0.1);
-    border-width: 1px;
-  }
-
   button {
-    background: var(--red);
+    background: var(--blue);
     color: white;
     border: 0;
     padding: 0.6rem 1rem;
@@ -37,36 +30,21 @@ const GlobalStyles = createGlobalStyle`
     }
   }
 
-  .gatsby-image-wrapper img[src*="base64\\,"] {
-    image-rendering: -moz-crisp-edges;
-    image-rendering: pixelated;
-  }
-
   /* Scrollbar Styles */
   body::-webkit-scrollbar {
     width: 12px;
   }
   html {
     scrollbar-width: thin;
-    scrollbar-color: var(--red) var(--white);
+    scrollbar-color: var(--blue) var(--white);
   }
   body::-webkit-scrollbar-track {
     background: var(--white);
   }
   body::-webkit-scrollbar-thumb {
-    background-color: var(--red) ;
+    background-color: var(--blue) ;
     border-radius: 6px;
     border: 3px solid var(--white);
-  }
-
-  img {
-    max-width: 100%;
-  }
-
-  .tilt {
-    transform: rotate(-2deg);
-    position: relative;
-    display: inline-block;
   }
 
 `;

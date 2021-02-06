@@ -1,49 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import styled from 'styled-components';
+import ThermostatDial from './ThermostatDial';
 
 import * as actions from '../store/actions/index';
 import useInterval from '../hooks/useInterval';
 import LiveChart from '../components/LiveChart';
+import ThermostatStyles from '../styles/ThermostatStyles';
 
-const ThermostatStyles = styled.div`
-	position: relative;
-	p,
-	h2 {
-		margin: 0;
-		margin-bottom: 1rem;
-	}
-	.controls {
-		border: solid 2px orangered;
-		padding: 2rem 0;
-		button + button {
-			margin-left: 1rem;
-		}
-	}
-	.targetTempControls {
-		button {
-			width: 50px;
-			font-size: 2rem;
-		}
-	}
-	.stateControls {
-		button {
-			width: 150px;
-		}
-	}
-	.register {
-		position: absolute;
-		right: 20px;
-	}
-	& > * {
-		&[disabled] {
-			pointer-events: none;
-			color: var(--grey);
-			filter: grayscale(75%);
-		}
-	}
-`;
+const sortSensorData = (sensorDataObj) => {
+	return Object.keys(sensorDataObj)
+		.sort()
+		.map((el) => ({
+			[el]: sensorDataObj[el],
+		}));
+};
 
 const Thermostat = (props) => {
 	const {
@@ -52,19 +23,14 @@ const Thermostat = (props) => {
 		uid,
 		targetUserTemp,
 		onChangeStateAPI,
+		temperatureReadings,
 	} = props;
 
-	// Difference between target temp and measured temp
-	const [tempDelta, setTempDelta] = useState();
-
+	const [latestSensorTemp, setLatestSensorTemp] = useState();
 	// Check if there is uid stored in session storage (on mount)
 	useEffect(() => {
 		onCheckSessionUid();
-		const timestamp = Date.now();
-		const timestampStart = moment(timestamp).subtract(20, 'm').format();
-		const timestampEnd = moment(timestamp).format();
-		onFetchLiveData(timestampStart, timestampEnd, targetUserTemp);
-	}, []);
+	}, [onCheckSessionUid]);
 
 	// Fetch live data every 5 mins
 	useInterval(() => {
@@ -72,6 +38,8 @@ const Thermostat = (props) => {
 		const timestampStart = moment(timestamp).subtract(5, 'm').format();
 		const timestampEnd = moment(timestamp).format();
 		onFetchLiveData(timestampStart, timestampEnd, targetUserTemp);
+		const sortedArr = sortSensorData(temperatureReadings);
+		setLatestSensorTemp(Object.values(sortedArr[sortedArr.length - 1])[0]);
 	}, 300000);
 
 	// Setting state to auto_heat or auto_cool when user adjusts target temp
@@ -106,37 +74,49 @@ const Thermostat = (props) => {
 			>
 				Turn off
 			</button>
-			<div className="controls targetTempControls">
-				<p>{props.targetUserTemp}&#176;</p>
-				<button onClick={props.onIncreaseTemp}>+</button>
-				<button onClick={props.onDecreaseTemp}>-</button>
-			</div>
-			<div className="controls stateControls">
-				<h2>Thermostat Mode</h2>
-				<button
-					value="auto_heat"
-					onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
-				>
-					Auto
-				</button>
-				<button
-					value="auto_cool"
-					onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
-				>
-					Cooling
-				</button>
-				<button
-					value="heat"
-					onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
-				>
-					Heating
-				</button>
-				<button
-					value="auto_standby"
-					onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
-				>
-					Ventilation
-				</button>
+			<div className="controlsBox">
+				<div className="controls targetTempControls">
+					<ThermostatDial
+						height="270px"
+						width="270px"
+						targetTemperature={targetUserTemp}
+						ambientTemperature={latestSensorTemp}
+						hva
+					/>
+					<div className="setTempButtonsBox">
+						<button onClick={props.onIncreaseTemp}>+</button>
+						<button onClick={props.onDecreaseTemp}>-</button>
+					</div>
+				</div>
+				<div className="controls stateControls">
+					<h2>Thermostat Mode</h2>
+					<div className="setStateButtonsBox">
+						<button
+							value="auto_heat"
+							onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
+						>
+							Auto
+						</button>
+						<button
+							value="auto_cool"
+							onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
+						>
+							Cooling
+						</button>
+						<button
+							value="heat"
+							onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
+						>
+							Heating
+						</button>
+						<button
+							value="auto_standby"
+							onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
+						>
+							Ventilation
+						</button>
+					</div>
+				</div>
 			</div>
 			<LiveChart />
 		</ThermostatStyles>
