@@ -61,17 +61,10 @@ const Thermostat = (props) => {
 	useEffect(() => {
 		onCheckSessionUid();
 		const timestamp = Date.now();
-		const timestampStart = moment(timestamp).subtract(5, 'm').format();
+		const timestampStart = moment(timestamp).subtract(20, 'm').format();
 		const timestampEnd = moment(timestamp).format();
 		onFetchLiveData(timestampStart, timestampEnd, targetUserTemp);
-	}, [
-		onCheckSessionUid,
-		onFetchLiveData,
-		uid,
-		targetUserTemp,
-		tempDelta,
-		setTempDelta,
-	]);
+	}, []);
 
 	// Fetch live data every 5 mins
 	useInterval(() => {
@@ -98,7 +91,6 @@ const Thermostat = (props) => {
 
 	return (
 		<ThermostatStyles>
-			<p>{props.uid}</p>
 			<button
 				className="register"
 				onClick={props.onRegisterThermostat}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import moment from 'moment';
 import { Line } from 'react-chartjs-2';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
@@ -16,17 +17,46 @@ const LiveChart = (props) => {
 	const [ambientValueArr, setAmbientValueArr] = useState([]);
 	const [targetValueArr, setTargetValueArr] = useState([]);
 	useEffect(() => {
+		// Sorting live readings based on timestamp
+		const sortedArr = Object.keys(temperatureReadings)
+			.sort()
+			.map((el) => ({
+				[el]: temperatureReadings[el],
+			}));
+		// console.log(
+		// 	`testArr: ${JSON.stringify(sortedArr)}`,
+		// 	`origArr: ${JSON.stringify(temperatureReadings)}`
+		// );
+
+		const labels = [];
+		const ambValues = [];
+		const targValues = [];
+		sortedArr.forEach((el, i) => {
+			labels.push(Object.keys(el)[0]);
+			ambValues.push(Object.values(el)[0]);
+			targValues.push(targetTempLog[Object.keys(el)[0]]);
+			// console.log(targetTempLog[Object.keys(el)[0]]);
+		});
+
+		setLabelArr(labels);
+		setAmbientValueArr(ambValues);
+		setTargetValueArr(targValues);
+		// console.log(targetValueArr);
+
 		// 1. Create array of labels (timestamps)
 		// 2. Create array of values (temp)
 		// For ambient temp
-		for (let key in temperatureReadings) {
-			setLabelArr((oldArray) => [...oldArray, key]);
-			setAmbientValueArr((oldArray) => [...oldArray, temperatureReadings[key]]);
-		}
+
+		// for (let key in sortedArr) {
+		// 	// const myDate = moment(key, 'MMMM Do YYYY, h:mm:ss a').toDate();
+		// 	// console.log(myDate);
+		// 	setLabelArr((oldArray) => [...oldArray, key]);
+		// 	setAmbientValueArr((oldArray) => [...oldArray, temperatureReadings[key]]);
+		// }
 		// For target temp
-		for (let key in targetTempLog) {
-			setTargetValueArr((oldArray) => [...oldArray, targetTempLog[key]]);
-		}
+		// for (let key in targetTempLog) {
+		// 	setTargetValueArr((oldArray) => [...oldArray, targetTempLog[key]]);
+		// }
 	}, [temperatureReadings]);
 
 	// 3. Inject array of labels and values into LiveChart
@@ -70,7 +100,7 @@ const LiveChart = (props) => {
 							{
 								ticks: {
 									min: 0,
-									max: 30,
+									suggestedMax: 30,
 									stepSize: 5,
 									callback: function (value) {
 										return `${value}°`;
