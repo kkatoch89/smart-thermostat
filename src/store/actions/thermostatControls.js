@@ -52,17 +52,27 @@ export const liveTempDataSuccess = (readings) => {
 	};
 };
 
+// Add Target Temperature at each timestamp
+export const addTargetTempLog = (newLogEntry) => {
+	return {
+		type: actionTypes.ADD_TARGET_TEMP_LOG,
+		newLogEntry: { ...newLogEntry },
+	};
+};
+
 // Fetch live data
-export const fetchLiveData = (timestampStart, timestampEnd, uid) => {
+export const fetchLiveData = (timestampStart, timestampEnd, targetTemp) => {
 	return (dispatch) => {
 		axios
 			.get(`sensors/temperature-1/?begin=${timestampStart}&end=${timestampEnd}`)
 			.then(({ data }) => {
-				// console.log(data);
 				const tempData = {};
+				const newTargetLogEntry = {};
 				data.data_points.forEach((el) => {
-					return (tempData[el.timestamp] = el.value);
+					tempData[el.timestamp] = parseInt(el.value);
+					newTargetLogEntry[el.timestamp] = targetTemp;
 				});
+				dispatch(addTargetTempLog(newTargetLogEntry));
 				dispatch(liveTempDataSuccess(tempData));
 			})
 			.catch((error) => {
@@ -85,7 +95,6 @@ export const registerSuccess = (uid) => {
 
 // Checking if uid on session storage or not
 export const checkSessionUid = () => {
-	console.log('Checking UID');
 	return (dispatch) => {
 		const sessionUid = localStorage.getItem('uid');
 		if (!!sessionUid) {

@@ -1,6 +1,6 @@
 import React from 'react';
 import Layout from './components/Layout';
-import Thermostat from './containers/Thermostat';
+import Thermostat from './components/Thermostat';
 
 function App() {
 	return (

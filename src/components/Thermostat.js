@@ -9,9 +9,27 @@ import LiveChart from '../components/LiveChart';
 
 const ThermostatStyles = styled.div`
 	position: relative;
+	p,
+	h2 {
+		margin: 0;
+		margin-bottom: 1rem;
+	}
 	.controls {
+		border: solid 2px orangered;
+		padding: 2rem 0;
 		button + button {
 			margin-left: 1rem;
+		}
+	}
+	.targetTempControls {
+		button {
+			width: 50px;
+			font-size: 2rem;
+		}
+	}
+	.stateControls {
+		button {
+			width: 150px;
 		}
 	}
 	.register {
@@ -28,25 +46,55 @@ const ThermostatStyles = styled.div`
 `;
 
 const Thermostat = (props) => {
-	const { onCheckSessionUid, onFetchLiveData, uid } = props;
+	const {
+		onCheckSessionUid,
+		onFetchLiveData,
+		uid,
+		targetUserTemp,
+		onChangeStateAPI,
+	} = props;
+
+	// Difference between target temp and measured temp
+	const [tempDelta, setTempDelta] = useState();
+
 	// Check if there is uid stored in session storage (on mount)
 	useEffect(() => {
 		onCheckSessionUid();
 		const timestamp = Date.now();
-		console.log(`[On mount]: ${timestamp}`);
 		const timestampStart = moment(timestamp).subtract(5, 'm').format();
 		const timestampEnd = moment(timestamp).format();
-		onFetchLiveData(timestampStart, timestampEnd, uid);
-	}, [onCheckSessionUid, onFetchLiveData, uid]);
+		onFetchLiveData(timestampStart, timestampEnd, targetUserTemp);
+	}, [
+		onCheckSessionUid,
+		onFetchLiveData,
+		uid,
+		targetUserTemp,
+		tempDelta,
+		setTempDelta,
+	]);
 
 	// Fetch live data every 5 mins
 	useInterval(() => {
 		const timestamp = Date.now();
-		console.log(`[On timer]: ${timestamp}`);
 		const timestampStart = moment(timestamp).subtract(5, 'm').format();
 		const timestampEnd = moment(timestamp).format();
-		onFetchLiveData(timestampStart, timestampEnd, uid);
+		onFetchLiveData(timestampStart, timestampEnd, targetUserTemp);
 	}, 300000);
+
+	// Setting state to auto_heat or auto_cool when user adjusts target temp
+	useEffect(() => {
+		const currTempReading =
+			props.temperatureReadings[Object.keys(props.temperatureReadings)[0]];
+		if (targetUserTemp > currTempReading) {
+			onChangeStateAPI('auto_heat', uid);
+		}
+		if (targetUserTemp < currTempReading) {
+			onChangeStateAPI('auto_cool', uid);
+		}
+		if (targetUserTemp === currTempReading) {
+			onChangeStateAPI('auto_standby', uid);
+		}
+	}, [targetUserTemp, onChangeStateAPI, uid]);
 
 	return (
 		<ThermostatStyles>
@@ -66,12 +114,12 @@ const Thermostat = (props) => {
 			>
 				Turn off
 			</button>
-			<div className="controls">
-				<p>{props.setUserTemp}&#176;</p>
+			<div className="controls targetTempControls">
+				<p>{props.targetUserTemp}&#176;</p>
 				<button onClick={props.onIncreaseTemp}>+</button>
 				<button onClick={props.onDecreaseTemp}>-</button>
 			</div>
-			<div className="controls">
+			<div className="controls stateControls">
 				<h2>Thermostat Mode</h2>
 				<button
 					value="auto_heat"
@@ -80,7 +128,7 @@ const Thermostat = (props) => {
 					Auto
 				</button>
 				<button
-					value="cool"
+					value="auto_cool"
 					onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
 				>
 					Cooling
@@ -106,7 +154,7 @@ const Thermostat = (props) => {
 const mapStateToProps = (state) => {
 	return {
 		thermostatState: state.thermostatControls.thermostatState,
-		setUserTemp: state.thermostatControls.setUserTemp,
+		targetUserTemp: state.thermostatControls.setUserTemp,
 		uid: state.thermostatControls.uid,
 		temperatureReadings: state.thermostatControls.temperatureReadings,
 	};
@@ -114,8 +162,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
 	return {
-		onToggleThermostat: (newState) =>
-			dispatch(actions.toggleThermostat(newState)),
 		onIncreaseTemp: () => dispatch(actions.increaseTemp()),
 		onDecreaseTemp: () => dispatch(actions.decreaseTemp()),
 		onRegisterThermostat: () => dispatch(actions.fetchUID()),

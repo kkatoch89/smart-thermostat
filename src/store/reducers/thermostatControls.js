@@ -4,8 +4,9 @@ import { updateObject } from '../../shared/utility';
 const initialState = {
 	uid: null,
 	thermostatState: 'off',
-	setUserTemp: 45,
+	setUserTemp: 24,
 	temperatureReadings: {},
+	targetTempLog: {},
 };
 
 /**************************************
@@ -38,6 +39,15 @@ const liveTempDataSuccess = (state, action) => {
 	return updateObject(state, { temperatureReadings: updatedReadings });
 };
 
+// Add Target Temperature at each timestamp
+const addTargetTempLog = (state, action) => {
+	const updateTargetTempLog = updateObject(
+		state.targetTempLog,
+		action.newLogEntry
+	);
+	return updateObject(state, { targetTempLog: updateTargetTempLog });
+};
+
 /**************************************
 	AUTH
 **************************************/
@@ -60,6 +70,8 @@ const thermostatControlsReducer = (state = initialState, action) => {
 			return registerSuccess(state, action);
 		case actionTypes.LIVE_TEMP_DATA_SUCCESS:
 			return liveTempDataSuccess(state, action);
+		case actionTypes.ADD_TARGET_TEMP_LOG:
+			return addTargetTempLog(state, action);
 		default:
 			return state;
 	}
