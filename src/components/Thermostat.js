@@ -32,6 +32,13 @@ const Thermostat = (props) => {
 		onCheckSessionUid();
 	}, [onCheckSessionUid]);
 
+	useEffect(() => {
+		const timestamp = Date.now();
+		const timestampStart = moment(timestamp).subtract(10, 'm').format();
+		const timestampEnd = moment(timestamp).format();
+		onFetchLiveData(timestampStart, timestampEnd, targetUserTemp);
+	}, []);
+
 	// Fetch live data every 5 mins
 	useInterval(() => {
 		const timestamp = Date.now();
