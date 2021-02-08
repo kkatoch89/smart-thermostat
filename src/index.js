@@ -13,10 +13,12 @@ import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
 import thermostatControlsReducer from './store/reducers/thermostatControls';
 
-const composeEnhancers =
-	process.env.NODE_ENV === 'development'
-		? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-		: null || compose;
+let composeEnhancers = null;
+if (process.env.NODE_ENV === 'development') {
+	composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+} else {
+	composeEnhancers = compose;
+}
 
 const rootReducer = combineReducers({
 	thermostatControls: thermostatControlsReducer,

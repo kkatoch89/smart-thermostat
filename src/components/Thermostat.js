@@ -39,7 +39,9 @@ const Thermostat = (props) => {
 		const timestampEnd = moment(timestamp).format();
 		onFetchLiveData(timestampStart, timestampEnd, targetUserTemp);
 		const sortedArr = sortSensorData(temperatureReadings);
-		setLatestSensorTemp(Object.values(sortedArr[sortedArr.length - 1])[0]);
+		if (sortedArr.length > 0) {
+			setLatestSensorTemp(Object.values(sortedArr[sortedArr.length - 1])[0]);
+		}
 	}, 300000);
 
 	// Setting state to auto_heat or auto_cool when user adjusts target temp
