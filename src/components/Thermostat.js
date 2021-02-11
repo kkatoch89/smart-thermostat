@@ -34,7 +34,7 @@ const Thermostat = (props) => {
 
 	useEffect(() => {
 		const timestamp = Date.now();
-		const timestampStart = moment(timestamp).subtract(10, 'm').format();
+		const timestampStart = moment(timestamp).subtract(60, 'm').format();
 		const timestampEnd = moment(timestamp).format();
 		onFetchLiveData(timestampStart, timestampEnd, targetUserTemp);
 	}, []);
@@ -66,6 +66,27 @@ const Thermostat = (props) => {
 		}
 	}, [targetUserTemp, onChangeStateAPI, uid]);
 
+	// Create control buttons
+	const controlBtns = () => {
+		const statesArr = [
+			{ slug: 'auto_heat', display: 'Auto' },
+			{ slug: 'auto_cool', display: 'Cooling' },
+			{ slug: 'auto_standby', display: 'Ventilation' },
+			{ slug: 'heat', display: 'Heating' },
+		];
+		return statesArr.map((state) => {
+			return (
+				<button
+					className={props.thermostatState === state.slug ? 'active' : ''}
+					value={state.slug}
+					onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
+				>
+					{state.display}
+				</button>
+			);
+		});
+	};
+
 	return (
 		<ThermostatStyles>
 			<button
@@ -77,6 +98,7 @@ const Thermostat = (props) => {
 			</button>
 			<h1>Unit 100 - Thermostat</h1>
 			<button
+				className={props.thermostatState === 'off' ? 'active' : ''}
 				type="button"
 				value="off"
 				onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
@@ -99,32 +121,7 @@ const Thermostat = (props) => {
 				</div>
 				<div className="controls stateControls">
 					<h2>Thermostat Mode</h2>
-					<div className="setStateButtonsBox">
-						<button
-							value="auto_heat"
-							onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
-						>
-							Auto
-						</button>
-						<button
-							value="auto_cool"
-							onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
-						>
-							Cooling
-						</button>
-						<button
-							value="heat"
-							onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
-						>
-							Heating
-						</button>
-						<button
-							value="auto_standby"
-							onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
-						>
-							Ventilation
-						</button>
-					</div>
+					<div className="setStateButtonsBox">{controlBtns()}</div>
 				</div>
 			</div>
 			<LiveChart />

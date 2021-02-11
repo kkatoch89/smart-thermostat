@@ -47,6 +47,9 @@ const ThermostatStyles = styled.div`
 		button {
 			width: 50px;
 			font-size: 2rem;
+			&:active {
+				background: var(--green);
+			}
 		}
 		button + button {
 			margin-left: 1rem;
@@ -68,6 +71,10 @@ const ThermostatStyles = styled.div`
 			color: var(--grey);
 			filter: grayscale(75%);
 		}
+	}
+	.active {
+		background: var(--green);
+		font-weight: bolder;
 	}
 `;
 
