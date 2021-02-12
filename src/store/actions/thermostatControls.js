@@ -1,4 +1,5 @@
 import axios from '../../axios-orders';
+import { sortSensorData } from '../../shared/utility';
 import * as actionTypes from './actionTypes';
 
 /**************************************
@@ -51,6 +52,16 @@ export const liveTempDataSuccess = (readings) => {
 	};
 };
 
+// Add latest datapoint
+export const addLatestDataPoint = (liveData) => {
+	const sortedArr = sortSensorData(liveData);
+	const latestDataPoint = Object.values(sortedArr[sortedArr.length - 1])[0];
+	return {
+		type: actionTypes.ADD_LATEST_DATA_POINT,
+		latestDataPoint: latestDataPoint,
+	};
+};
+
 // Add Target Temperature at each timestamp
 export const addTargetTempLog = (newLogEntry) => {
 	return {
@@ -73,6 +84,7 @@ export const fetchLiveData = (timestampStart, timestampEnd, targetTemp) => {
 				});
 				dispatch(addTargetTempLog(newTargetLogEntry));
 				dispatch(liveTempDataSuccess(tempData));
+				dispatch(addLatestDataPoint(tempData));
 			})
 			.catch((error) => {
 				console.log(error.message);
@@ -112,7 +124,6 @@ export const fetchUID = () => {
 			axios
 				.post('/thermostat/register/')
 				.then(({ data }) => {
-					console.log(data);
 					localStorage.setItem('uid', data.uid_hash);
 					dispatch(registerSuccess(data.uid_hash));
 				})

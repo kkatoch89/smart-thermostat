@@ -36,9 +36,11 @@ const ThermostatStyles = styled.div`
 	.targetTempControls {
 		grid-area: targetTempControls;
 		width: 400px;
+		min-height: 325px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		justify-content: center;
 	}
 	.setTempButtonsBox {
 		display: flex;

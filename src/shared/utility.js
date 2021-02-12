@@ -24,3 +24,11 @@ export const checkValidity = (value, rules) => {
 
 	return isValid;
 };
+
+export const sortSensorData = (sensorDataObj) => {
+	return Object.keys(sensorDataObj)
+		.sort()
+		.map((el) => ({
+			[el]: sensorDataObj[el],
+		}));
+};

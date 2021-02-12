@@ -7,6 +7,7 @@ const initialState = {
 	setUserTemp: 24,
 	temperatureReadings: {},
 	targetTempLog: {},
+	latestDataPoint: null,
 };
 
 /**************************************
@@ -14,11 +15,11 @@ const initialState = {
 **************************************/
 
 const toggleThermostat = (state, action) => {
+	console.log(action.newState);
 	return updateObject(state, { thermostatState: action.newState });
 };
 
 const increaseTemp = (state, action) => {
-	console.log('Increase');
 	return updateObject(state, { setUserTemp: state.setUserTemp + 1 });
 };
 
@@ -32,6 +33,7 @@ const decreaseTemp = (state, action) => {
 
 const liveTempDataSuccess = (state, action) => {
 	// console.log({ ...action.readings });
+	// console.log('action.readings', action.readings);
 	const updatedReadings = updateObject(
 		state.temperatureReadings,
 		action.readings
@@ -46,6 +48,11 @@ const addTargetTempLog = (state, action) => {
 		action.newLogEntry
 	);
 	return updateObject(state, { targetTempLog: updateTargetTempLog });
+};
+
+// Add latest live data point
+const addLatestDataPoint = (state, action) => {
+	return updateObject(state, { latestDataPoint: action.latestDataPoint });
 };
 
 /**************************************
@@ -70,6 +77,8 @@ const thermostatControlsReducer = (state = initialState, action) => {
 			return registerSuccess(state, action);
 		case actionTypes.LIVE_TEMP_DATA_SUCCESS:
 			return liveTempDataSuccess(state, action);
+		case actionTypes.ADD_LATEST_DATA_POINT:
+			return addLatestDataPoint(state, action);
 		case actionTypes.ADD_TARGET_TEMP_LOG:
 			return addTargetTempLog(state, action);
 		default:

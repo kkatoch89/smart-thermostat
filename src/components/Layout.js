@@ -9,7 +9,6 @@ const LayoutStyles = styled.div`
 		min-height: 100vh;
 		margin: 0 auto;
 		text-align: center;
-		/* border: 2px solid orangered; */
 	}
 `;
 
