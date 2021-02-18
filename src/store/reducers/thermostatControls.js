@@ -15,7 +15,6 @@ const initialState = {
 **************************************/
 
 const toggleThermostat = (state, action) => {
-	console.log(action.newState);
 	return updateObject(state, { thermostatState: action.newState });
 };
 
@@ -32,8 +31,6 @@ const decreaseTemp = (state, action) => {
 **************************************/
 
 const liveTempDataSuccess = (state, action) => {
-	// console.log({ ...action.readings });
-	// console.log('action.readings', action.readings);
 	const updatedReadings = updateObject(
 		state.temperatureReadings,
 		action.readings

@@ -7,9 +7,19 @@ class ThermostatDial extends Component {
 	getStyles() {
 		// Determine if the thermostat is actively working to reach the target temperature.
 		let dialColor = '#222';
-		if (this.props.hvacMode === 'heating') {
+		if (
+			(this.props.hvacMode === 'heat' &&
+				this.props.targetTemperature > this.props.ambientTemperature) ||
+			(this.props.hvacMode === 'auto_heat' &&
+				this.props.targetTemperature > this.props.ambientTemperature)
+		) {
 			dialColor = '#E36304';
-		} else if (this.props.hvacMode === 'cooling') {
+		} else if (
+			(this.props.hvacMode === 'auto_cool' &&
+				this.props.targetTemperature < this.props.ambientTemperature) ||
+			(this.props.hvacMode === 'auto_heat' &&
+				this.props.targetTemperature < this.props.ambientTemperature)
+		) {
 			dialColor = '#007AF1';
 		}
 
@@ -34,9 +44,9 @@ class ThermostatDial extends Component {
 				textAnchor: 'middle',
 				fontFamily: 'Helvetica, sans-serif',
 				alignmentBaseline: 'central',
-				fontSize: '10rem',
+				fontSize: 'clamp(8rem, 6vw, 10rem)',
 				// fontWeight: 'bold',
-				visibility: this.props.away ? 'hidden' : 'visible',
+				visibility: this.props.off ? 'hidden' : 'visible',
 			},
 			ambient: {
 				fill: 'white',
@@ -46,20 +56,20 @@ class ThermostatDial extends Component {
 				fontSize: '22px',
 				fontWeight: 'bold',
 			},
-			away: {
+			off: {
 				fill: 'white',
 				textAnchor: 'middle',
 				fontFamily: 'Helvetica, sans-serif',
 				alignmentBaseline: 'central',
 				fontSize: '72px',
 				fontWeight: 'bold',
-				opacity: this.props.away ? '1' : '0',
+				opacity: this.props.off ? '1' : '0',
 				pointerEvents: 'none',
 			},
 			leaf: {
-				fill: '#13EB13',
+				fill: 'rgba(135, 211, 124, 1)',
 				opacity: this.props.leaf ? '1' : '0',
-				visibility: this.props.away ? 'hidden' : 'visible',
+				visibility: this.props.off ? 'hidden' : 'visible',
 				WebkitTransition: 'opacity 0.5s',
 				transition: 'opacity 0.5s',
 				pointerEvents: 'none',
@@ -276,6 +286,40 @@ class ThermostatDial extends Component {
 		// The styles change based on state.
 		const styles = this.getStyles();
 
+		/*
+		const dialDisplay = () => {
+			switch (this.props.hvacMode) {
+				case 'auto_heat':
+					return (
+						<text x={radius} y={radius} style={styles.target}>
+							{`${Math.round(this.props.targetTemperature)}`}
+							&#176;
+						</text>
+					);
+				case 'auto_cool':
+					return (
+						<text x={radius} y={radius} style={styles.target}>
+							Cooling
+						</text>
+					);
+				case 'auto_standby':
+					return (
+						<text x={radius} y={radius} style={styles.target}>
+							Ventilation
+						</text>
+					);
+				case 'heat':
+					return (
+						<text x={radius} y={radius} style={styles.target}>
+							Heating
+						</text>
+					);
+				default:
+					return;
+			}
+		};
+		*/
+
 		// Piece it all together to form the thermostat display.
 		return (
 			<svg
@@ -295,6 +339,7 @@ class ThermostatDial extends Component {
 					{`${Math.round(this.props.targetTemperature)}`}
 					&#176;
 				</text>
+				{/* {dialDisplay()} */}
 				<text
 					x={ambientPosition[0]}
 					y={ambientPosition[1]}
@@ -302,8 +347,8 @@ class ThermostatDial extends Component {
 				>
 					{Math.round(this.props.ambientTemperature)}
 				</text>
-				<text x={radius} y={radius} style={styles.away}>
-					AWAY
+				<text x={radius} y={radius} style={styles.off}>
+					OFF
 				</text>
 				<path
 					d={leafDef}
@@ -324,10 +369,11 @@ ThermostatDial.defaultProps = {
 	minValue: 0,
 	maxValue: 40,
 	away: false,
+	off: true,
 	leaf: false,
 	ambientTemperature: 24,
 	targetTemperature: 24,
-	hvacMode: 'on',
+	hvacMode: 'auto_heat',
 };
 
 export default ThermostatDial;

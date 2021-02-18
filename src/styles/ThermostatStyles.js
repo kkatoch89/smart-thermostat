@@ -56,7 +56,14 @@ const ThermostatStyles = styled.div`
 		button + button {
 			margin-left: 1rem;
 		}
+		.smartModeBtn {
+			width: 210px;
+			&.smartActive {
+				background: var(--green);
+			}
+		}
 	}
+
 	.stateControls {
 		grid-area: stateControls;
 		width: 400px;

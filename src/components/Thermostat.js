@@ -17,9 +17,11 @@ const Thermostat = (props) => {
 		onChangeStateAPI,
 		latestSensorDataPoint,
 		uid,
+		thermostatState,
 	} = props;
 
 	const [loading, setLoading] = useState(true);
+	const [smartMode, setSmartMode] = useState(false);
 	// Check if there is uid stored in session storage (on mount)
 	useEffect(() => {
 		onCheckSessionUid();
@@ -51,7 +53,7 @@ const Thermostat = (props) => {
 	useEffect(() => {
 		const autoStateChange = () => {
 			if (targetUserTemp > latestSensorDataPoint) {
-				onChangeStateAPI('auto_heat', uid);
+				onChangeStateAPI('heat', uid);
 			}
 			if (targetUserTemp < latestSensorDataPoint) {
 				onChangeStateAPI('auto_cool', uid);
@@ -87,6 +89,13 @@ const Thermostat = (props) => {
 		});
 	};
 
+	// Toggle Smart Mode
+	const smartModeBtnHandler = () => {
+		if (thermostatState !== 'off') {
+			setSmartMode(!smartMode);
+		}
+	};
+
 	return (
 		<ThermostatStyles>
 			<button
@@ -101,14 +110,16 @@ const Thermostat = (props) => {
 				className={props.thermostatState === 'off' ? 'active' : ''}
 				type="button"
 				value="off"
-				onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
+				onClick={(e) => {
+					setSmartMode(false);
+					props.onChangeStateAPI(e.target.value, props.uid);
+				}}
 			>
 				Turn off
 			</button>
 			<div className="controlsBox">
 				<div className="controls targetTempControls">
 					{loading ? (
-						// <p>Loading...</p>
 						<LoadingSpinner />
 					) : (
 						<>
@@ -117,9 +128,23 @@ const Thermostat = (props) => {
 								width="270px"
 								targetTemperature={targetUserTemp}
 								ambientTemperature={latestSensorDataPoint}
+								hvacMode={thermostatState}
+								off={thermostatState === 'off' ? true : false}
+								leaf={thermostatState === 'auto_heat' ? true : false}
 							/>
 							<div className="setTempButtonsBox">
 								<button onClick={props.onIncreaseTemp}>+</button>
+								<button
+									className={
+										smartMode || thermostatState === 'auto_heat'
+											? 'smartModeBtn smartActive'
+											: 'smartModeBtn'
+									}
+									onClick={smartModeBtnHandler}
+								>
+									Smart Mode -{' '}
+									{smartMode || thermostatState === 'auto_heat' ? 'On' : 'Off'}
+								</button>
 								<button onClick={props.onDecreaseTemp}>-</button>
 							</div>
 						</>
