@@ -1,31 +1,34 @@
 import React, { useEffect, useState } from 'react';
+import { Redirect, Route, Switch } from 'react-router';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import ThermostatDial from './ThermostatDial';
+import styled from 'styled-components';
 
 import * as actions from '../store/actions/index';
 import useInterval from '../hooks/useInterval';
+import ThermostatControls from './ThermostatControls';
 import LiveChart from '../components/LiveChart';
-import ThermostatStyles from '../styles/ThermostatStyles';
-import LoadingSpinner from './LoadingSpinner';
+
+const ThermostatStyles = styled.div`
+	position: relative;
+	padding: 2rem 0;
+	background: rgba(3, 3, 3, 0.2);
+	flex-grow: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	p,
+	h1,
+	h2 {
+		margin: 0;
+		margin-bottom: 1rem;
+	}
+`;
 
 const Thermostat = (props) => {
-	const {
-		onCheckSessionUid,
-		onFetchLiveData,
-		targetUserTemp,
-		onChangeStateAPI,
-		latestSensorDataPoint,
-		uid,
-		thermostatState,
-	} = props;
+	const { onFetchLiveData, targetUserTemp } = props;
 
 	const [loading, setLoading] = useState(true);
-	const [smartMode, setSmartMode] = useState(false);
-	// Check if there is uid stored in session storage (on mount)
-	useEffect(() => {
-		onCheckSessionUid();
-	}, [onCheckSessionUid]);
 
 	// Fetch live data on mount
 	useEffect(() => {
@@ -49,113 +52,18 @@ const Thermostat = (props) => {
 		onFetchLiveData(timestampStart, timestampEnd, targetUserTemp);
 	}, 300000);
 
-	// Setting state to auto_heat or auto_cool when user adjusts target temp
-	useEffect(() => {
-		const autoStateChange = () => {
-			if (targetUserTemp > latestSensorDataPoint) {
-				onChangeStateAPI('heat', uid);
-			}
-			if (targetUserTemp < latestSensorDataPoint) {
-				onChangeStateAPI('auto_cool', uid);
-			}
-			if (targetUserTemp === latestSensorDataPoint) {
-				onChangeStateAPI('auto_standby', uid);
-			}
-		};
-		if (uid) {
-			autoStateChange();
-		}
-	}, [targetUserTemp, onChangeStateAPI]);
-
-	// Create control buttons
-	const controlBtns = () => {
-		const statesArr = [
-			{ slug: 'auto_heat', display: 'Auto' },
-			{ slug: 'auto_cool', display: 'Cooling' },
-			{ slug: 'auto_standby', display: 'Ventilation' },
-			{ slug: 'heat', display: 'Heating' },
-		];
-		return statesArr.map((state) => {
-			return (
-				<button
-					key={state.slug}
-					className={props.thermostatState === state.slug ? 'active' : ''}
-					value={state.slug}
-					onClick={(e) => props.onChangeStateAPI(e.target.value, props.uid)}
-				>
-					{state.display}
-				</button>
-			);
-		});
-	};
-
-	// Toggle Smart Mode
-	const smartModeBtnHandler = () => {
-		if (thermostatState !== 'off') {
-			setSmartMode(!smartMode);
-		}
-	};
-
 	return (
 		<ThermostatStyles>
-			<button
-				className="register"
-				onClick={props.onRegisterThermostat}
-				disabled={!!uid}
-			>
-				Register Thermostat
-			</button>
-			<h1>Unit 100 - Thermostat</h1>
-			<button
-				className={props.thermostatState === 'off' ? 'active' : ''}
-				type="button"
-				value="off"
-				onClick={(e) => {
-					setSmartMode(false);
-					props.onChangeStateAPI(e.target.value, props.uid);
-				}}
-			>
-				Turn off
-			</button>
-			<div className="controlsBox">
-				<div className="controls targetTempControls">
-					{loading ? (
-						<LoadingSpinner />
-					) : (
-						<>
-							<ThermostatDial
-								height="270px"
-								width="270px"
-								targetTemperature={targetUserTemp}
-								ambientTemperature={latestSensorDataPoint}
-								hvacMode={thermostatState}
-								off={thermostatState === 'off' ? true : false}
-								leaf={thermostatState === 'auto_heat' ? true : false}
-							/>
-							<div className="setTempButtonsBox">
-								<button onClick={props.onIncreaseTemp}>+</button>
-								<button
-									className={
-										smartMode || thermostatState === 'auto_heat'
-											? 'smartModeBtn smartActive'
-											: 'smartModeBtn'
-									}
-									onClick={smartModeBtnHandler}
-								>
-									Smart Mode -{' '}
-									{smartMode || thermostatState === 'auto_heat' ? 'On' : 'Off'}
-								</button>
-								<button onClick={props.onDecreaseTemp}>-</button>
-							</div>
-						</>
+			<Switch>
+				<Route
+					path="/controls"
+					render={(props) => (
+						<ThermostatControls {...props} loading={loading} />
 					)}
-				</div>
-				<div className="controls stateControls">
-					<h2>Thermostat Mode</h2>
-					<div className="setStateButtonsBox">{controlBtns()}</div>
-				</div>
-			</div>
-			<LiveChart />
+				/>
+				<Route exact path="/live-chart" component={LiveChart} />
+				<Route render={() => <Redirect to="/controls" />} />
+			</Switch>
 		</ThermostatStyles>
 	);
 };
@@ -171,12 +79,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
 	return {
-		onIncreaseTemp: () => dispatch(actions.increaseTemp()),
-		onDecreaseTemp: () => dispatch(actions.decreaseTemp()),
-		onRegisterThermostat: () => dispatch(actions.fetchUID()),
 		onCheckSessionUid: () => dispatch(actions.checkSessionUid()),
-		onChangeStateAPI: (newState, uid) =>
-			dispatch(actions.changeStateAPI(newState, uid)),
 		onFetchLiveData: (timestampStart, timestampEnd, uid) =>
 			dispatch(actions.fetchLiveData(timestampStart, timestampEnd, uid)),
 	};

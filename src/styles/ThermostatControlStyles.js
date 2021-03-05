@@ -1,9 +1,6 @@
 import styled from 'styled-components';
 
-const ThermostatStyles = styled.div`
-	position: relative;
-	padding: 2rem 0;
-	background: rgba(3, 3, 3, 0.2);
+const ThermostatControlStyles = styled.div`
 	p,
 	h1,
 	h2 {
@@ -56,11 +53,31 @@ const ThermostatStyles = styled.div`
 		button + button {
 			margin-left: 1rem;
 		}
-		.smartModeBtn {
-			width: 210px;
-			&.smartActive {
-				background: var(--green);
-			}
+	}
+	.toggleBtn {
+		width: 100px;
+		background: rgba(151, 21, 0, 0.7);
+		&.active {
+			background: rgba(83, 192, 67, 0.7);
+		}
+	}
+	.smartModeIndicator {
+		padding: 0 2rem;
+		color: rgba(0, 0, 0, 0.5);
+		height: 100%;
+		display: flex;
+		align-items: center;
+	}
+	.smartActive {
+		color: var(--green);
+		position: relative;
+
+		&::after {
+			width: 200px;
+			height: 20px;
+			color: var(--white);
+			position: absolute;
+			bottom: 0;
 		}
 	}
 
@@ -87,4 +104,4 @@ const ThermostatStyles = styled.div`
 	}
 `;
 
-export default ThermostatStyles;
+export default ThermostatControlStyles;

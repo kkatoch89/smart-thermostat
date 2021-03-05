@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 
 class ThermostatDial extends Component {
-	// componentDidMount() {
-	// 	console.log(this.props.ambientTemperature);
-	// }
 	getStyles() {
 		// Determine if the thermostat is actively working to reach the target temperature.
 		let dialColor = '#222';
