@@ -82,6 +82,7 @@ export const fetchLiveData = (timestampStart, timestampEnd, targetTemp) => {
 					tempData[el.timestamp] = parseInt(el.value);
 					newTargetLogEntry[el.timestamp] = targetTemp;
 				});
+				console.log(newTargetLogEntry);
 				dispatch(addTargetTempLog(newTargetLogEntry));
 				dispatch(liveTempDataSuccess(tempData));
 				dispatch(addLatestDataPoint(tempData));

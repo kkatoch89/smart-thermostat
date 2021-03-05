@@ -2,19 +2,19 @@ import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyles = createGlobalStyle`
   :root {
-    --blue: rgba(2, 188, 199, .8);
-    --green: rgba(135, 211, 124, 1);
+    --blue: #7ab7c4;
+    --green: #53c043;
     --white: #fff;
-    --grey: #efefef;
+    --grey: #E0E0E0;
   }
   html {
     font-size: 10px;
   }
-
   body {
     font-size: 2rem;
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: 400;
   }
-
   button {
     background: var(--blue);
     color: white;

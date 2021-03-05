@@ -9,6 +9,9 @@ const LayoutStyles = styled.div`
 		min-height: 100vh;
 		margin: 0 auto;
 		text-align: center;
+		display: flex;
+		flex-direction: column;
+		justify-content: stretch;
 	}
 `;
 
